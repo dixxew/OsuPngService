@@ -5,20 +5,15 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Копируем csproj и восстанавливаем зависимости
-COPY OsuPngService.csproj .
-RUN dotnet restore
+COPY OsuPngService/OsuPngService.csproj OsuPngService/
+RUN dotnet restore OsuPngService/OsuPngService.csproj
 
 # Копируем весь код
-COPY . .
+COPY OsuPngService/ OsuPngService/
 
 # Публикуем приложение
+WORKDIR /src/OsuPngService
 RUN dotnet publish -c Release -o /app/publish
-
-# Скачиваем Chromium для Puppeteer
-RUN dotnet tool install --global dotnet-script && \
-    export PATH="$PATH:/root/.dotnet/tools" && \
-    cd /app/publish && \
-    dotnet exec /app/publish/OsuPngService.dll download-chromium || true
 
 # ---------------------------
 # STAGE 2: Runtime
@@ -46,6 +41,7 @@ RUN apt-get update && apt-get install -y \
     libcairo2 \
     libappindicator3-1 \
     xdg-utils \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -53,8 +49,8 @@ WORKDIR /app
 # Копируем опубликованное приложение
 COPY --from=build /app/publish .
 
-# Копируем Chromium из build стадии
-COPY --from=build /root/.local-chromium /root/.local-chromium
+# Скачиваем Chromium при сборке
+RUN dotnet OsuPngService.dll download-chromium || echo "Chromium download skipped"
 
 # Открываем порт
 EXPOSE 5000
