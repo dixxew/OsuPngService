@@ -3,7 +3,7 @@ version: '3.9'
 services:
   osupng-service:
     build:
-      context: ./OsuPngService
+      context: .
       dockerfile: Dockerfile
     container_name: osupng-service
     environment:
