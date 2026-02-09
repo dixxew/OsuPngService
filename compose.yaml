@@ -1,0 +1,27 @@
+﻿version: '3.9'
+
+services:
+  osupng-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: osupng-service
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_ENVIRONMENT=Production
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+    shm_size: 2gb
+    networks:
+      - osu-russian-rep
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/osupng"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+networks:
+  osu-russian-rep:
+    external: true
