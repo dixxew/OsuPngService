@@ -48,10 +48,6 @@ WORKDIR /app
 
 # Копируем опубликованное приложение
 COPY --from=build /app/publish .
-
-# Скачиваем Chromium при сборке
-RUN dotnet OsuPngService.dll download-chromium || echo "Chromium download skipped"
-
 # Открываем порт
 EXPOSE 5000
 
