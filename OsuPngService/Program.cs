@@ -90,7 +90,7 @@ internal class Program
         {
             Width = 1000,
             Height = 700,
-            DeviceScaleFactor = 2
+            DeviceScaleFactor = 1
         });
 
         await page.SetContentAsync(html);
